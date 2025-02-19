@@ -27,7 +27,7 @@ func millerRabin(m int) bool {
 	var s int
 
 	for d%2 == 0 {
-		d = d >> 2
+		d = d >> 1
 		s++
 	}
 
@@ -39,7 +39,7 @@ func millerRabin(m int) bool {
 
 		x := int(math.Pow(a, float64(d))) % m
 
-		if x != 1 || x != (m-1) {
+		if !(x == 1 || x == (m-1)) {
 			return false
 		}
 
