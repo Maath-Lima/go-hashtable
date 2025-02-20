@@ -6,12 +6,12 @@ import (
 )
 
 func TestUtils_FindNextPrime(t *testing.T) {
-	n := 6
+	n := 90
 
 	rest := utils.FindNextPrime(n)
-	resp := 23
+	resp := 97
 
-	if rest == resp {
+	if rest != resp {
 		t.Fatalf("%v does not match %v as expected next prime number.", rest, resp)
 	}
 }
