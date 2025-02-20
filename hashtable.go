@@ -3,6 +3,7 @@ package main
 var (
 	defaultCapacity int16   = 5
 	loadFactor      float32 = 0.7
+	minLoadFactor   float32 = 0.25
 )
 
 type Entry struct {
@@ -58,10 +59,11 @@ func (hashtable *Hashtable) Insert(key int, element string) {
 }
 
 func (hashtable *Hashtable) loadFactorResize() {
-	isLoadFactorTreshold := (hashtable.nElements / len(hashtable.table)) > int(loadFactor)
+	balance := (float32(hashtable.nElements) / float32(len(hashtable.table)))
 
-	if !isLoadFactorTreshold {
-		return
+	if balance < minLoadFactor {
 	}
 
+	if balance > loadFactor {
+	}
 }
