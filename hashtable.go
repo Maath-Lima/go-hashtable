@@ -1,5 +1,9 @@
 package main
 
+import (
+	"hashtable/utils"
+)
+
 var (
 	defaultCapacity int16   = 5
 	loadFactor      float32 = 0.7
@@ -15,6 +19,10 @@ type Entry struct {
 type Hashtable struct {
 	table     []Entry
 	nElements int
+}
+
+func createHashTable(capacity int) *Hashtable {
+	return &Hashtable{table: make([]Entry, capacity)}
 }
 
 func CreateHashTable() *Hashtable {
@@ -33,7 +41,7 @@ func (hashtable *Hashtable) isOccupied(index int) bool {
 	return (hashtable.table[index].key != 0 || hashtable.table[index].tombstone)
 }
 
-func (hashtable *Hashtable) Insert(key int, element string) {
+func (hashtable *Hashtable) insert(key int, element string) {
 	capacity := len(hashtable.table)
 
 	index := hashFunction(key, capacity)
@@ -43,7 +51,7 @@ func (hashtable *Hashtable) Insert(key int, element string) {
 	var collisions int
 
 	for hashtable.isOccupied(index) {
-		if hashtable.table[index].key == key {
+		if hashtable.table[index].key == key && collisions == 0 {
 			hashtable.table[index].value = element
 			return
 		}
@@ -54,16 +62,37 @@ func (hashtable *Hashtable) Insert(key int, element string) {
 
 	hashtable.table[index] = Entry{key: key, value: element}
 	hashtable.nElements++
+}
 
+func (hashtable *Hashtable) Insert(key int, element string) {
+	hashtable.insert(key, element)
 	hashtable.loadFactorResize()
 }
 
 func (hashtable *Hashtable) loadFactorResize() {
-	balance := (float32(hashtable.nElements) / float32(len(hashtable.table)))
+	var ht *Hashtable
+	len := len(hashtable.table)
+
+	balance := (float32(hashtable.nElements) / float32(len))
 
 	if balance < minLoadFactor {
 	}
 
 	if balance > loadFactor {
+		newLen := utils.FindNextPrime(len * 2)
+
+		ht = createHashTable(newLen)
+
+		for i := 0; i < len; i++ {
+			if hashtable.isOccupied(i) {
+				entry := hashtable.table[i]
+
+				ht.insert(entry.key, entry.value)
+			}
+		}
+	}
+
+	if ht != nil && ht.nElements > 0 {
+		*hashtable = *ht
 	}
 }
