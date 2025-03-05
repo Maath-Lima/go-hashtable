@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"hashtable/utils"
 )
 
@@ -38,7 +39,7 @@ func doubleHashFunction(key int, capacity int) int {
 }
 
 func (hashtable *Hashtable) isOccupied(index int) bool {
-	return (hashtable.table[index].key != 0 || hashtable.table[index].tombstone)
+	return (hashtable.table[index].key != 0 && !hashtable.table[index].tombstone)
 }
 
 func (hashtable *Hashtable) insert(key int, element string) {
@@ -51,8 +52,9 @@ func (hashtable *Hashtable) insert(key int, element string) {
 	var collisions int
 
 	for hashtable.isOccupied(index) {
-		if hashtable.table[index].key == key && collisions == 0 {
+		if hashtable.table[index].key == key {
 			hashtable.table[index].value = element
+			hashtable.table[index].tombstone = false
 			return
 		}
 
@@ -75,6 +77,7 @@ func (hashtable *Hashtable) loadFactorResize() {
 
 	balance := (float32(hashtable.nElements) / float32(len))
 
+	// Do when delete method is up to use!
 	if balance < minLoadFactor {
 	}
 
@@ -95,4 +98,25 @@ func (hashtable *Hashtable) loadFactorResize() {
 	if ht != nil && ht.nElements > 0 {
 		*hashtable = *ht
 	}
+}
+
+func (hashtable *Hashtable) Get(key int) (string, error) {
+	capacity := len(hashtable.table)
+
+	index := hashFunction(key, capacity)
+	step := doubleHashFunction(key, capacity)
+
+	iIndex := index
+	var collisions int
+
+	for hashtable.isOccupied(index) {
+		if hashtable.table[index].key == key {
+			return hashtable.table[index].value, nil
+		}
+
+		collisions++
+		index = (iIndex + collisions*step) % capacity
+	}
+
+	return "", errors.New("provided key doesn't exist")
 }
