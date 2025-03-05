@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"hashtable/utils"
 )
 
@@ -100,7 +99,18 @@ func (hashtable *Hashtable) loadFactorResize() {
 	}
 }
 
-func (hashtable *Hashtable) Get(key int) (string, error) {
+func (hashtable *Hashtable) Get(key int) string {
+
+	e, _ := hashtable.lookUp(key)
+
+	if e != nil {
+		return e.value
+	}
+
+	panic("provided key doesn't exist")
+}
+
+func (hashtable *Hashtable) lookUp(key int) (*Entry, int) {
 	capacity := len(hashtable.table)
 
 	index := hashFunction(key, capacity)
@@ -111,12 +121,12 @@ func (hashtable *Hashtable) Get(key int) (string, error) {
 
 	for hashtable.isOccupied(index) {
 		if hashtable.table[index].key == key {
-			return hashtable.table[index].value, nil
+			return &hashtable.table[index], index
 		}
 
 		collisions++
 		index = (iIndex + collisions*step) % capacity
 	}
 
-	return "", errors.New("provided key doesn't exist")
+	return nil, index
 }

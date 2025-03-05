@@ -12,12 +12,6 @@ func main() {
 	hastable.Insert(11, "c")
 	hastable.Insert(16, "d")
 
-	key := 12
-	v, err := hastable.Get(key)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("Value for key %d: %s", key, v)
+	key := 11
+	fmt.Printf("Value for key %d: %s", key, hastable.Get(key))
 }
