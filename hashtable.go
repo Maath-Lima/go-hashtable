@@ -46,7 +46,6 @@ func (hashtable *Hashtable) insert(key int, element string) {
 
 	if e != nil && e.key == key {
 		e.value = element
-		e.tombstone = false
 		return
 	}
 
@@ -57,6 +56,22 @@ func (hashtable *Hashtable) insert(key int, element string) {
 func (hashtable *Hashtable) Insert(key int, element string) {
 	hashtable.insert(key, element)
 	hashtable.loadFactorResize()
+}
+
+func (hashtable *Hashtable) Del(key int) {
+	e, _ := hashtable.lookUp(key)
+
+	if e != nil {
+		e.tombstone = true
+		hashtable.nElements--
+
+		return
+	}
+
+	panic("provided key doesn't exist for deletion")
+
+	// Resize down
+	// hashtable.loadFactorResize()
 }
 
 func (hashtable *Hashtable) loadFactorResize() {
@@ -89,7 +104,6 @@ func (hashtable *Hashtable) loadFactorResize() {
 }
 
 func (hashtable *Hashtable) Get(key int) string {
-
 	e, _ := hashtable.lookUp(key)
 
 	if e != nil {
