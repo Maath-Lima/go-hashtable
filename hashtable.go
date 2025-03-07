@@ -42,26 +42,15 @@ func (hashtable *Hashtable) isOccupied(index int) bool {
 }
 
 func (hashtable *Hashtable) insert(key int, element string) {
-	capacity := len(hashtable.table)
+	e, i := hashtable.lookUp(key)
 
-	index := hashFunction(key, capacity)
-	step := doubleHashFunction(key, capacity)
-
-	iIndex := index
-	var collisions int
-
-	for hashtable.isOccupied(index) {
-		if hashtable.table[index].key == key {
-			hashtable.table[index].value = element
-			hashtable.table[index].tombstone = false
-			return
-		}
-
-		collisions++
-		index = (iIndex + collisions*step) % capacity
+	if e != nil && e.key == key {
+		e.value = element
+		e.tombstone = false
+		return
 	}
 
-	hashtable.table[index] = Entry{key: key, value: element}
+	hashtable.table[i] = Entry{key: key, value: element}
 	hashtable.nElements++
 }
 
